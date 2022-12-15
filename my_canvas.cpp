@@ -10,6 +10,7 @@
 #include "GPath.h"
 #include "GPixel.h"
 #include "GPoint.h"
+#include "GRadialGradient.cpp"
 #include "GRect.h"
 #include "GScanConverter.h"
 #include "GShader.h"
@@ -367,6 +368,65 @@ public:
         GBlitter blitter = GBlitter(fDevice, paint);
 
         GScanConverter::scanComplex(storage, edgeCount, blitter);
+    }
+
+    /**
+     *  Return a radial-gradient shader.
+     *
+     *  This is a shader defined by a circle with center and a radius.
+     *  The array of colors are evenly distributed between the center (color[0]) out to
+     *  the radius (color[count-1]). Beyond the radius, it respects the TileMode.
+     */
+    std::unique_ptr<GShader> createRadialGradient(GPoint center, float radius,
+                                                          const GColor colors[], int count,
+                                                          GShader::TileMode mode) {
+        return std::unique_ptr<GShader>(new GRadialGradient(center, radius, colors, count, mode));
+    }
+
+    /**
+     *  Add contour(s) to the specified path that will draw a line from p0 to p1 with the specified
+     *  width and CapType. Note that "width" is the distance from one side of the stroke to the
+     *  other, ala its thickness.
+     */
+    void addLine(GPath* path, GPoint p0, GPoint p1, float width, CapType cap) {
+        if (p0.fY > p1.fY) {
+            GPoint temp = p1;
+            p1 = p0;
+            p0 = temp;
+        }
+        float slope = (p1.fY - p0.fY) / (p1.fX - p0.fX);
+        float perpSlope = 1 / -slope;
+
+        float corner_angle = atan(perpSlope);
+
+        float corner_dx = cos(corner_angle) * width / 2;
+        float corner_dy = sin(corner_angle) * width / 2;
+
+        GPoint c0 = {p0.fX + corner_dx, p0.fY + corner_dy};
+        GPoint c1 = {p0.fX - corner_dx, p0.fY - corner_dy};
+        GPoint c2 = {p1.fX - corner_dx, p1.fY - corner_dy};
+        GPoint c3 = {p1.fX + corner_dx, p1.fY + corner_dy};
+
+        path->moveTo(c0).lineTo(c1).lineTo(c2).lineTo(c3);
+        if (cap == CapType::kRound) {
+            path->addCircle(p0, width/2, GPath::kCW_Direction);
+            path->addCircle(p1, width/2, GPath::kCW_Direction);
+        } else if (cap == CapType::kSquare) {
+            GRect rect1 = GRect::LTRB(
+            p0.x() - width / 2,
+            p0.y() - width / 2,
+            p0.x() + width / 2,
+            p0.y() + width / 2);
+
+            GRect rect2 = GRect::LTRB(
+            p1.x() - width / 2,
+            p1.y() - width / 2,
+            p1.x() + width / 2,
+            p1.y() + width / 2);
+
+            path->addRect(rect1, GPath::kCCW_Direction);
+            path->addRect(rect2, GPath::kCCW_Direction);
+        }
     }
 
     /**
