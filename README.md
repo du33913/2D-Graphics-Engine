@@ -6,11 +6,34 @@ A 2D Graphics Engine that implements geometric primitives, scan conversion, clip
 
 ### Unit Tests
 
+To run/test your code, a few unit tests are supplied:
+
+```shell
+$ make
+$ ./image -e expected
+$ ./tests
+$ ./bench
+```
+
 A few unit tests are supplied.
 
 ```shell
 $ make tests
+$ ./tests
+```
+
+For more details when testing:
+
+```shell
+$ make dbench
+$ ./dbench
+$
+$ mkdir diff
+$ ./image -e expected -d diff
+$ open diff/index.html
+$
 $ ./tests -v
+$ ./bench -m substring-to-match
 ```
 
 ### Images
