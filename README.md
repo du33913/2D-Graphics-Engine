@@ -15,13 +15,6 @@ $ ./tests
 $ ./bench
 ```
 
-A few unit tests are supplied.
-
-```shell
-$ make tests
-$ ./tests
-```
-
 For more details when testing:
 
 ```shell
