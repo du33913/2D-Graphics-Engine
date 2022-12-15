@@ -10,6 +10,7 @@
 #include "image_pa4.cpp"
 #include "image_pa5.cpp"
 #include "image_pa6.cpp"
+#include "image_pa7.cpp"
 
 const GDrawRec gDrawRecs[] = {
     { draw_solid_ramp,  256, 7*28,  "solid_ramp",   1   },
@@ -47,6 +48,9 @@ const GDrawRec gDrawRecs[] = {
     { mesh_3,           512, 512,   "both_mesh",   6 },
     { spock_quad,       512, 512,   "spock_quad",  6 },
     { color_quad,       512, 512,   "color_quad",  6 },
+
+    { final_radial,     512, 512,   "final_radial", 7 },
+    { final_stroke,     512, 512,   "final_stroke", 7 },
 
     { nullptr, 0, 0, nullptr },
 };
